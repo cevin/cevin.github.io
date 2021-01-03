@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="cevin">
+
+
+
+
+
+<title>淘宝开放平台SDK简洁版 | Cevin</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Cevin&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/categories">Categories</a>
+                
+                    <a class="menu-item" href="/tags">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Cevin&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/categories">Categories</a>
+                
+                    <a class="menu-item" href="/tags">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">淘宝开放平台SDK简洁版</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">cevin</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">三月 13, 2013&nbsp;&nbsp;19:45:27</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p>之前做淘宝开放平台开发时候留的一个简单版的sdk（也就是一个库）</p>
+<p>调用：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$taobao</span> = <span class="keyword">new</span> taobao(key,secret_key);</span><br><span class="line"> </span><br><span class="line"><span class="variable">$taobao</span>-&gt;method = <span class="string">&#x27;taobao.xxx.xx&#x27;</span>;</span><br><span class="line"><span class="variable">$taobao</span>-&gt;fields = <span class="string">&#x27;xxxxxxxxx&#x27;</span>;</span><br><span class="line"><span class="variable">$taobao</span>-&gt;nick = <span class="string">&#x27;xxxx&#x27;</span>;</span><br><span class="line"><span class="comment">//或者: $taobao-&gt;setnick(&#x27;xxxx&#x27;);</span></span><br><span class="line"><span class="variable">$rowset</span> = <span class="variable">$taobao</span>-&gt;execute();</span><br></pre></td></tr></table></figure>
+<p>每个接口需要什么参数，自己完善。当初俺就这么熬过来的:)</p>
+<a id="more"></a>
+
+<p>完整代码（缓存部分自己完善）：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">taobao</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="variable">$param</span> = <span class="keyword">array</span>();</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$url</span> = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">private</span> <span class="variable">$public_key</span> = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="variable">$secret_key</span> = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$error</span> = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"><span class="variable">$a</span>,<span class="variable">$s</span></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;public_key = <span class="variable">$a</span>;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;secret_key = <span class="variable">$s</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__set</span>(<span class="params"><span class="variable">$key</span>,<span class="variable">$val</span></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;param[<span class="variable">$key</span>] = <span class="variable">$val</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__call</span>(<span class="params"><span class="variable">$m</span>,<span class="variable">$args</span></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (substr(<span class="variable">$m</span>,<span class="number">0</span>,<span class="number">3</span>) == <span class="string">&#x27;set&#x27;</span>) &#123;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;param[substr(<span class="variable">$m</span>,<span class="number">3</span>)] = <span class="variable">$args</span>;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 通过淘宝API获取数据</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> int $cache_expire 大于0的数字，将缓存该值同时为缓存过期时间</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> json</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">execute</span>(<span class="params"><span class="variable">$cache_expire</span>=<span class="number">0</span></span>) </span>&#123;</span><br><span class="line">        <span class="variable">$api</span> = <span class="string">&#x27;http://gw.api.taobao.com/router/rest&#x27;</span>;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;param[<span class="string">&#x27;parent_id&#x27;</span>] = <span class="string">&#x27;top-apitools&#x27;</span>;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;param[<span class="string">&#x27;format&#x27;</span>] = <span class="string">&#x27;json&#x27;</span>;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;param[<span class="string">&#x27;timestamp&#x27;</span>] = date(<span class="string">&#x27;Y-m-d H:i:s&#x27;</span>);</span><br><span class="line">        <span class="keyword">$this</span>-&gt;param[<span class="string">&#x27;app_key&#x27;</span>] = <span class="keyword">$this</span>-&gt;public_key;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;param[<span class="string">&#x27;v&#x27;</span>] = <span class="string">&#x27;2.0&#x27;</span>;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;param[<span class="string">&#x27;sign_method&#x27;</span>] = <span class="string">&#x27;hmac&#x27;</span>;</span><br><span class="line">        <span class="variable">$secret_key</span> = <span class="keyword">$this</span>-&gt;secret_key;</span><br><span class="line"> </span><br><span class="line">        ksort(<span class="keyword">$this</span>-&gt;param);</span><br><span class="line"> </span><br><span class="line">        <span class="comment">// 拼凑字符串</span></span><br><span class="line">        <span class="variable">$str</span> = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">        <span class="keyword">foreach</span> (<span class="keyword">$this</span>-&gt;param <span class="keyword">as</span> <span class="variable">$k</span>=&gt;<span class="variable">$v</span>) <span class="variable">$str</span> .= <span class="variable">$k</span>.<span class="variable">$v</span>;</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">$this</span>-&gt;param[<span class="string">&#x27;sign&#x27;</span>] = strtoupper(bin2hex(mhash(<span class="number">1</span>,<span class="variable">$str</span>,<span class="variable">$secret_key</span>)));</span><br><span class="line"> </span><br><span class="line">                <span class="keyword">$this</span>-&gt;url = <span class="variable">$api</span>.<span class="string">&#x27;?&#x27;</span>.http_build_query(<span class="keyword">$this</span>-&gt;param);</span><br><span class="line"> </span><br><span class="line">        <span class="variable">$ch</span> = curl_init();</span><br><span class="line">        curl_setopt(<span class="variable">$ch</span>,CURLOPT_URL,<span class="variable">$api</span>);</span><br><span class="line">        curl_setopt(<span class="variable">$ch</span>,CURLOPT_RETURNTRANSFER,<span class="number">1</span>);</span><br><span class="line">        curl_setopt(<span class="variable">$ch</span>,CURLOPT_POST,<span class="number">1</span>);</span><br><span class="line">        curl_setopt(<span class="variable">$ch</span>,CURLOPT_POSTFIELDS,<span class="keyword">$this</span>-&gt;param);</span><br><span class="line">        <span class="variable">$ret</span> = curl_exec(<span class="variable">$ch</span>);</span><br><span class="line">        curl_close(<span class="variable">$ch</span>);</span><br><span class="line">        <span class="variable">$ret</span> = @json_decode(<span class="variable">$ret</span>,<span class="number">1</span>,<span class="number">512</span>,JSON_BIGINT_AS_STRING);</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">$this</span>-&gt;param = <span class="keyword">array</span>();</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">isset</span>(<span class="variable">$ret</span>[<span class="string">&#x27;error_response&#x27;</span>])) &#123;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;error = <span class="variable">$ret</span>[<span class="string">&#x27;error_response&#x27;</span>][<span class="string">&#x27;sub_msg&#x27;</span>];</span><br><span class="line">            <span class="keyword">$this</span>-&gt;errno = <span class="variable">$ret</span>[<span class="string">&#x27;error_response&#x27;</span>][<span class="string">&#x27;code&#x27;</span>];</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="variable">$ret</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+        </div>
+
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/php/"># php</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/post/%E8%A7%A3%E5%86%B3PHP-FPM%E8%BF%9B%E7%A8%8B%E7%96%AF%E7%8B%82%E5%8D%A0%E7%94%A8%E5%86%85%E5%AD%98%E7%9A%84%E9%97%AE%E9%A2%98.html">解决PHP FPM进程疯狂占用内存的问题</a>
+            
+            
+            <a class="next" rel="next" href="/post/XML%E8%BD%AC%E6%8D%A2%E4%B8%BA%E6%95%B0%E7%BB%84.html">XML转换为数组</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© cevin | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

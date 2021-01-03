@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="cevin">
+
+
+
+
+
+<title>解决PHP FPM进程疯狂占用内存的问题 | Cevin</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Cevin&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/categories">Categories</a>
+                
+                    <a class="menu-item" href="/tags">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Cevin&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/categories">Categories</a>
+                
+                    <a class="menu-item" href="/tags">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">解决PHP FPM进程疯狂占用内存的问题</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">cevin</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">三月 15, 2013&nbsp;&nbsp;19:42:55</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p>VPS装好环境后。架上博客。刚开始一切都好。第二天收到监控宝的提醒，晚上有两次宕机，连接服务器失败的情况。</p>
+<p>VPS是BuyVM的最低配的128m内存（突发内存256m），OpenVZ的架构，也无法通过增加swap来缓解内存压力。</p>
+<a id="more"></a>
+
+<p>检查程序、日志也没发现什么有疑点的地方，想起来编译php的时候没有配置php参数。遂改了一下php配置。得到有效缓解，具体改动如下：</p>
+<p><code>/usr/local/php/etc/php-fpm.conf</code></p>
+<p>重启php-fpm服务，早上10点多改的，下午4点左右top一下发现php-fpm内存占用还是居高不下。逼不得已改动了如下配置：<br><code>pm.max_requests = 1</code></p>
+<p>世界清净了，php-fpm进程始终保持在5-8个。哦也。</p>
+<p>总结</p>
+<p>每个请求完成后php-cgi会回收内存，但是不会释放给操作系统，这样就会导致大量内存被php-cgi占用</p>
+<blockquote>
+<p>  pm.max_requests的意思是发送多少个请求后会重启该线程，需要适当降低这个值，让php-fpm自动的释放内存，还有另一个跟它有关联的值max_children，这个是每次php-fpm会建立多少个进程，这样<code>实际上的内存消耗=max_children*max_requests*每个请求使用内存</code>。</p>
+</blockquote>
+<p>update</p>
+<p>最近很多通过搜索引擎进来看到这篇文章的。友情提示一下：<br>在小内存下调整max_requests是个不错的方案。但是在大内存下还是内存资源吃紧，我还是建议你检查一下自己的代码逻辑和架构方案吧。</p>
+
+        </div>
+
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/php/"># php</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/post/PHP%E6%AD%A3%E5%88%99%E6%8F%90%E5%8F%96URL.html">PHP正则提取URL</a>
+            
+            
+            <a class="next" rel="next" href="/post/%E6%B7%98%E5%AE%9D%E5%BC%80%E6%94%BE%E5%B9%B3%E5%8F%B0SDK%E7%AE%80%E6%B4%81%E7%89%88.html">淘宝开放平台SDK简洁版</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© cevin | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

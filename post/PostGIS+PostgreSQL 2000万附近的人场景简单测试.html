@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="cevin">
+
+
+
+
+
+<title>PostGIS+PostgreSQL 2000万数据 附近的人场景简单测试 | Cevin</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Cevin&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/categories">Categories</a>
+                
+                    <a class="menu-item" href="/tags">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Cevin&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/categories">Categories</a>
+                
+                    <a class="menu-item" href="/tags">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">PostGIS+PostgreSQL 2000万数据 附近的人场景简单测试</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">cevin</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">五月 16, 2018&nbsp;&nbsp;13:50:16</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/postgresql/">postgresql</a>
+                            
+                                <a href="/categories/postgresql/postgis/">postgis</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p>建表</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">test<span class="operator">=</span># <span class="keyword">create</span> <span class="keyword">table</span> test( id serial8 <span class="keyword">primary</span> <span class="keyword">key</span>, poi geometry(point,<span class="number">4326</span>),type int8 <span class="keyword">null</span> <span class="keyword">default</span> <span class="keyword">null</span>);</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span></span><br></pre></td></tr></table></figure>
+<p>插入测试数据</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">test<span class="operator">=</span># <span class="keyword">insert</span> <span class="keyword">into</span> test(poi,type) <span class="keyword">select</span> st_geometryfromtext(<span class="string">&#x27;point(&#x27;</span><span class="operator">||</span>trunc(<span class="number">100000</span><span class="operator">*</span>(<span class="number">0.5</span><span class="operator">-</span>random()))<span class="operator">||</span><span class="string">&#x27; &#x27;</span><span class="operator">||</span>trunc(<span class="number">1000000</span><span class="operator">*</span>(<span class="number">0.5</span><span class="operator">-</span>random()))<span class="operator">||</span><span class="string">&#x27;)&#x27;</span>,<span class="number">4326</span>),random() <span class="keyword">from</span> generate_series(<span class="number">1</span>,<span class="number">20000000</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="number">0</span> <span class="number">20000000</span></span><br><span class="line"><span class="type">Time</span>: <span class="number">98026.341</span> ms (<span class="number">01</span>:<span class="number">38.026</span>)</span><br></pre></td></tr></table></figure>
+<p>创建索引</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">test<span class="operator">=</span># <span class="keyword">create</span> index idx_t_poi <span class="keyword">on</span> test <span class="keyword">using</span> gist(poi) <span class="keyword">with</span>(buffering<span class="operator">=</span><span class="keyword">on</span>);</span><br><span class="line"><span class="keyword">CREATE</span> INDEX</span><br><span class="line"><span class="type">Time</span>: <span class="number">278719.390</span> ms (<span class="number">04</span>:<span class="number">38.719</span>)</span><br></pre></td></tr></table></figure>
+<p>数据总量</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">test<span class="operator">=</span># <span class="keyword">select</span> <span class="built_in">count</span>(<span class="operator">*</span>) <span class="keyword">from</span> test;</span><br><span class="line">  count</span><br><span class="line"><span class="comment">----------</span></span><br><span class="line"> <span class="number">20000000</span></span><br><span class="line">(<span class="number">1</span> <span class="type">row</span>)</span><br><span class="line"></span><br><span class="line"><span class="type">Time</span>: <span class="number">2593.415</span> ms (<span class="number">00</span>:<span class="number">02.593</span>)</span><br><span class="line"></span><br><span class="line">test<span class="operator">=</span># <span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> test limit <span class="number">10</span>;</span><br><span class="line">   id    <span class="operator">|</span>                        poi                         <span class="operator">|</span> type</span><br><span class="line"><span class="comment">---------+----------------------------------------------------+------</span></span><br><span class="line"> <span class="number">2481157</span> <span class="operator">|</span> <span class="number">0101000020E61000000000000000006240000000000</span>CF113C1 <span class="operator">|</span>    <span class="number">0</span></span><br><span class="line"> <span class="number">2481158</span> <span class="operator">|</span> <span class="number">0101000020E6100000000000000084</span>B24000000000009EEE40 <span class="operator">|</span>    <span class="number">1</span></span><br><span class="line"> <span class="number">2481159</span> <span class="operator">|</span> <span class="number">0101000020E61000000000000000</span>D9CEC000000000F4071241 <span class="operator">|</span>    <span class="number">0</span></span><br><span class="line"> <span class="number">2481160</span> <span class="operator">|</span> <span class="number">0101000020E6100000000000004023</span>D64000000000DCDA1741 <span class="operator">|</span>    <span class="number">0</span></span><br><span class="line"> <span class="number">2481161</span> <span class="operator">|</span> <span class="number">0101000020E61000000000000040</span>AFDCC00000000070F21D41 <span class="operator">|</span>    <span class="number">1</span></span><br><span class="line"> <span class="number">2481162</span> <span class="operator">|</span> <span class="number">0101000020E61000000000000060</span>BDE3C000000000804ACDC0 <span class="operator">|</span>    <span class="number">0</span></span><br><span class="line"> <span class="number">2481163</span> <span class="operator">|</span> <span class="number">0101000020E6100000000000004093</span>D74000000000D8131141 <span class="operator">|</span>    <span class="number">0</span></span><br><span class="line"> <span class="number">2481164</span> <span class="operator">|</span> <span class="number">0101000020E6100000000000000020</span>B640000000003031F540 <span class="operator">|</span>    <span class="number">0</span></span><br><span class="line"> <span class="number">2481165</span> <span class="operator">|</span> <span class="number">0101000020E610000000000000402</span>BE54000000000502AF7C0 <span class="operator">|</span>    <span class="number">0</span></span><br><span class="line"> <span class="number">2481166</span> <span class="operator">|</span> <span class="number">0101000020E610000000000000801</span>DDB4000000000A0FB1A41 <span class="operator">|</span>    <span class="number">1</span></span><br><span class="line">(<span class="number">10</span> <span class="keyword">rows</span>)</span><br><span class="line"></span><br><span class="line"><span class="type">Time</span>: <span class="number">0.320</span> ms</span><br></pre></td></tr></table></figure>
+<p>经典附近的人场景简测</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">test<span class="operator">=</span># <span class="keyword">select</span> <span class="operator">*</span>, st_distance(poi,st_geometryfromtext(<span class="string">&#x27;point(250 250)&#x27;</span>,<span class="number">4326</span>)) <span class="keyword">as</span> 距离 <span class="keyword">from</span> test <span class="keyword">order</span> <span class="keyword">by</span> poi <span class="operator">&lt;</span><span class="operator">-</span><span class="operator">&gt;</span> st_geometryfromtext(<span class="string">&#x27;point(250 250)&#x27;</span>,<span class="number">4326</span>) limit <span class="number">10</span>;</span><br><span class="line">    id    <span class="operator">|</span>                        poi                         <span class="operator">|</span> type <span class="operator">|</span>       距离</span><br><span class="line"><span class="comment">----------+----------------------------------------------------+------+------------------</span></span><br><span class="line">  <span class="number">7373290</span> <span class="operator">|</span> <span class="number">0101000020E61000000000000000806</span>B400000000000407240 <span class="operator">|</span>    <span class="number">1</span> <span class="operator">|</span> <span class="number">51.6139516022558</span></span><br><span class="line">  <span class="number">6020475</span> <span class="operator">|</span> <span class="number">0101000020E61000000000000000206</span>A400000000000406A40 <span class="operator">|</span>    <span class="number">1</span> <span class="operator">|</span> <span class="number">57.2800139664787</span></span><br><span class="line"> <span class="number">17394418</span> <span class="operator">|</span> <span class="number">0101000020E61000000000000000</span>A067400000000000807040 <span class="operator">|</span>    <span class="number">0</span> <span class="operator">|</span> <span class="number">62.5859409132754</span></span><br><span class="line"> <span class="number">22442432</span> <span class="operator">|</span> <span class="number">0101000020E610000000000000004067400000000000807140</span> <span class="operator">|</span>    <span class="number">0</span> <span class="operator">|</span> <span class="number">70.6823881882892</span></span><br><span class="line"> <span class="number">15806746</span> <span class="operator">|</span> <span class="number">0101000020E61000000000000000</span>A074400000000000F07040 <span class="operator">|</span>    <span class="number">0</span> <span class="operator">|</span> <span class="number">82.7103379270089</span></span><br><span class="line"> <span class="number">10588179</span> <span class="operator">|</span> <span class="number">0101000020E610000000000000000070400000000000507540</span> <span class="operator">|</span>    <span class="number">1</span> <span class="operator">|</span> <span class="number">91.1975876873944</span></span><br><span class="line">  <span class="number">3716158</span> <span class="operator">|</span> <span class="number">0101000020E610000000000000006067400000000000807440</span> <span class="operator">|</span>    <span class="number">1</span> <span class="operator">|</span>  <span class="number">100.26464980241</span></span><br><span class="line">  <span class="number">3864992</span> <span class="operator">|</span> <span class="number">0101000020E61000000000000000406</span>C400000000000C07540 <span class="operator">|</span>    <span class="number">0</span> <span class="operator">|</span> <span class="number">100.895986045036</span></span><br><span class="line">  <span class="number">7887852</span> <span class="operator">|</span> <span class="number">0101000020E61000000000000000</span>D076400000000000806F40 <span class="operator">|</span>    <span class="number">1</span> <span class="operator">|</span> <span class="number">115.017389989514</span></span><br><span class="line"> <span class="number">18442793</span> <span class="operator">|</span> <span class="number">0101000020E61000000000000000</span>C05A400000000000207040 <span class="operator">|</span>    <span class="number">1</span> <span class="operator">|</span> <span class="number">143.223601407031</span></span><br><span class="line">(<span class="number">10</span> <span class="keyword">rows</span>)</span><br><span class="line"></span><br><span class="line"><span class="type">Time</span>: <span class="number">8.352</span> ms</span><br></pre></td></tr></table></figure>
+<p>查询计划</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">test<span class="operator">=</span># explain (buffers,analyze) <span class="keyword">select</span> <span class="operator">*</span>, st_distance(poi,st_geometryfromtext(<span class="string">&#x27;point(250 250)&#x27;</span>,<span class="number">4326</span>)) <span class="keyword">as</span> 距离 <span class="keyword">from</span> test <span class="keyword">order</span> <span class="keyword">by</span> poi <span class="operator">&lt;</span><span class="operator">-</span><span class="operator">&gt;</span> st_geometryfromtext(<span class="string">&#x27;point(250 250)&#x27;</span>,<span class="number">4326</span>) limit <span class="number">10</span>;</span><br><span class="line">                                                             QUERY PLAN</span><br><span class="line"><span class="comment">-------------------------------------------------------------------------------------------------------------------------------------</span></span><br><span class="line"> Limit  (cost<span class="operator">=</span><span class="number">0.42</span>.<span class="number">.1</span><span class="number">.93</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">10</span> width<span class="operator">=</span><span class="number">64</span>) (actual <span class="type">time</span><span class="operator">=</span><span class="number">0.104</span>.<span class="number">.0</span><span class="number">.133</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">10</span> loops<span class="operator">=</span><span class="number">1</span>)</span><br><span class="line">   Buffers: shared hit<span class="operator">=</span><span class="number">15</span></span><br><span class="line">   <span class="operator">-</span><span class="operator">&gt;</span>  Index Scan <span class="keyword">using</span> idx_t_poi <span class="keyword">on</span> test  (cost<span class="operator">=</span><span class="number">0.42</span>.<span class="number">.3017052</span><span class="number">.98</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">19975328</span> width<span class="operator">=</span><span class="number">64</span>) (actual <span class="type">time</span><span class="operator">=</span><span class="number">0.104</span>.<span class="number">.0</span><span class="number">.131</span> <span class="keyword">rows</span><span class="operator">=</span><span class="number">10</span> loops<span class="operator">=</span><span class="number">1</span>)</span><br><span class="line">         <span class="keyword">Order</span> <span class="keyword">By</span>: (poi <span class="operator">&lt;</span><span class="operator">-</span><span class="operator">&gt;</span> <span class="string">&#x27;0101000020E61000000000000000406F400000000000406F40&#x27;</span>::geometry)</span><br><span class="line">         Buffers: shared hit<span class="operator">=</span><span class="number">15</span></span><br><span class="line"> Planning <span class="type">time</span>: <span class="number">0.089</span> ms</span><br><span class="line"> Execution <span class="type">time</span>: <span class="number">0.155</span> ms</span><br><span class="line">(<span class="number">7</span> <span class="keyword">rows</span>)</span><br><span class="line"></span><br><span class="line"><span class="type">Time</span>: <span class="number">0.531</span> ms</span><br></pre></td></tr></table></figure>
+
+
+<p>增加附加条件(如 性别) 检索所有女性</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">test<span class="operator">=</span># <span class="keyword">select</span> <span class="operator">*</span>, st_distance(poi,st_geometryfromtext(<span class="string">&#x27;point(250 250)&#x27;</span>,<span class="number">4326</span>)) <span class="keyword">as</span> 距离 <span class="keyword">from</span> test  <span class="keyword">where</span> type <span class="operator">=</span> <span class="number">0</span> <span class="keyword">order</span> <span class="keyword">by</span> poi <span class="operator">&lt;</span><span class="operator">-</span><span class="operator">&gt;</span> st_geometryfromtext(<span class="string">&#x27;point(250 250)&#x27;</span>,<span class="number">4326</span>) limit <span class="number">10</span>;</span><br><span class="line">    id    <span class="operator">|</span>                        poi                         <span class="operator">|</span> type <span class="operator">|</span>       距离</span><br><span class="line"><span class="comment">----------+----------------------------------------------------+------+------------------</span></span><br><span class="line"> <span class="number">17394418</span> <span class="operator">|</span> <span class="number">0101000020E61000000000000000</span>A067400000000000807040 <span class="operator">|</span>    <span class="number">0</span> <span class="operator">|</span> <span class="number">62.5859409132754</span></span><br><span class="line"> <span class="number">22442432</span> <span class="operator">|</span> <span class="number">0101000020E610000000000000004067400000000000807140</span> <span class="operator">|</span>    <span class="number">0</span> <span class="operator">|</span> <span class="number">70.6823881882892</span></span><br><span class="line"> <span class="number">15806746</span> <span class="operator">|</span> <span class="number">0101000020E61000000000000000</span>A074400000000000F07040 <span class="operator">|</span>    <span class="number">0</span> <span class="operator">|</span> <span class="number">82.7103379270089</span></span><br><span class="line">  <span class="number">3864992</span> <span class="operator">|</span> <span class="number">0101000020E61000000000000000406</span>C400000000000C07540 <span class="operator">|</span>    <span class="number">0</span> <span class="operator">|</span> <span class="number">100.895986045036</span></span><br><span class="line"> <span class="number">20592048</span> <span class="operator">|</span> <span class="number">0101000020E610000000000000003072400000000000005940</span> <span class="operator">|</span>    <span class="number">0</span> <span class="operator">|</span> <span class="number">155.502411556863</span></span><br><span class="line"> <span class="number">13869099</span> <span class="operator">|</span> <span class="number">0101000020E61000000000000000405</span>D400000000000B07540 <span class="operator">|</span>    <span class="number">0</span> <span class="operator">|</span>  <span class="number">164.61470165207</span></span><br><span class="line">  <span class="number">4452301</span> <span class="operator">|</span> <span class="number">0101000020E61000000000000000</span>A069400000000000F07940 <span class="operator">|</span>    <span class="number">0</span> <span class="operator">|</span> <span class="number">171.026313764871</span></span><br><span class="line">  <span class="number">3002613</span> <span class="operator">|</span> <span class="number">0101000020E61000000000000000</span>C069400000000000107A40 <span class="operator">|</span>    <span class="number">0</span> <span class="operator">|</span> <span class="number">172.699160391705</span></span><br><span class="line"> <span class="number">15500934</span> <span class="operator">|</span> <span class="number">0101000020E61000000000000000</span>E073400000000000007A40 <span class="operator">|</span>    <span class="number">0</span> <span class="operator">|</span> <span class="number">179.387847971929</span></span><br><span class="line"> <span class="number">11762983</span> <span class="operator">|</span> <span class="number">0101000020E61000000000000000</span>C055400000000000E07440 <span class="operator">|</span>    <span class="number">0</span> <span class="operator">|</span> <span class="number">183.371208208922</span></span><br><span class="line">(<span class="number">10</span> <span class="keyword">rows</span>)</span><br><span class="line"></span><br><span class="line"><span class="type">Time</span>: <span class="number">0.557</span> ms</span><br></pre></td></tr></table></figure>
+
+        </div>
+
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/postgresql/"># postgresql</a>
+                    
+                        <a href="/tags/postgis/"># postgis</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/post/Snowflake%20with%20PHP.html">Snowflake With PHP</a>
+            
+            
+            <a class="next" rel="next" href="/post/citusdb%E8%B8%A9%E5%9D%91%E5%B0%8F%E8%AE%A1.html">Citusdb踩坑小计</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© cevin | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>
