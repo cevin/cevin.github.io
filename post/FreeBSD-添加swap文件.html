@@ -12,7 +12,7 @@
 
 
 
-<title>Tag | Cevin</title>
+<title>FreeBSD 添加swap文件 | Cevin</title>
 
 
 
@@ -104,62 +104,78 @@
     }
 </script>
         <div class="main">
+            <div class="container">
+    
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">FreeBSD 添加swap文件</h1>
             
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">cevin</a>
+                    
 
-    <div class="container">
-        <div class="post-wrap tags">
-            <h2 class="post-title">-&nbsp;Tag Cloud&nbsp;-</h2>
+                    
+                        <span class="post-time">
+                        Date: <a href="#">一月 3, 2021&nbsp;&nbsp;12:56:05</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
 
-            <div class="tag-cloud-tags">
-                
-                    <a href="/tags/linux/">linux<small>(3)</small></a>
-                
-                    <a href="/tags/lvm/">lvm<small>(1)</small></a>
-                
-                    <a href="/tags/swap/">swap<small>(1)</small></a>
-                
-                    <a href="/tags/php/">php<small>(7)</small></a>
-                
-                    <a href="/tags/bt/">bt<small>(1)</small></a>
-                
-                    <a href="/tags/torrent/">torrent<small>(1)</small></a>
-                
-                    <a href="/tags/postgresql/">postgresql<small>(7)</small></a>
-                
-                    <a href="/tags/pipelinedb/">pipelinedb<small>(1)</small></a>
-                
-                    <a href="/tags/postgis/">postgis<small>(1)</small></a>
-                
-                    <a href="/tags/logical/">logical<small>(1)</small></a>
-                
-                    <a href="/tags/publication/">publication<small>(1)</small></a>
-                
-                    <a href="/tags/subscription/">subscription<small>(1)</small></a>
-                
-                    <a href="/tags/citusdb/">citusdb<small>(1)</small></a>
-                
-                    <a href="/tags/tidb/">tidb<small>(1)</small></a>
-                
-                    <a href="/tags/mysql/">mysql<small>(1)</small></a>
-                
-                    <a href="/tags/docker/">docker<small>(1)</small></a>
-                
-                    <a href="/tags/%E7%AC%94%E8%AE%B0/">笔记<small>(1)</small></a>
-                
-                    <a href="/tags/sql/">sql<small>(1)</small></a>
-                
-                    <a href="/tags/python/">python<small>(1)</small></a>
-                
-                    <a href="/tags/opencv/">opencv<small>(1)</small></a>
-                
-                    <a href="/tags/note/">note<small>(1)</small></a>
-                
-                    <a href="/tags/FreeBSD/">FreeBSD<small>(1)</small></a>
-                
-            </div>
+        <div class="post-content">
+            <ol>
+<li>创建swap文件</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dd <span class="keyword">if</span>=/dev/zero of=/swapfile bs=1024m count=2</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>设置文件权限</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod 0600 /swapfile</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>添加到<code>/etc/fstab</code></li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">&quot;md99 none swap sw,file=/swapfile 0 0 &quot;</span> &gt;&gt; /etc/fstab<span class="string">&quot;</span></span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>启用</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">swapon -aq</span><br><span class="line"><span class="comment"># 或重启</span></span><br></pre></td></tr></table></figure>
+
         </div>
-    </div>
 
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/FreeBSD/"># FreeBSD</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/post/docker%E7%AC%94%E8%AE%B0.html">Docker笔记</a>
+            
+        </section>
+
+
+    </article>
+</div>
 
         </div>
         <footer id="footer" class="footer">
