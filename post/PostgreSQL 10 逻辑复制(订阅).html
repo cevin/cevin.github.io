@@ -137,22 +137,22 @@
 
         <div class="post-content">
             <ul>
-<li><p>master 创建发布者</p>
+<li><p>primary 创建发布者</p>
 <p>  <code>CREATE PUBLIATION name FOR TABLE table_name1,table_name2</code></p>
 <p>  创建一个名为name的发布者包含表 table_name1和table_name2</p>
 <p>  <code>CREATE PUBLICATION name FOR ALL TABLES</code></p>
 <p>  创建一个名为name的发布者，包含当前库的所有表</p>
 </li>
-<li><p>slave 创建订阅者</p>
+<li><p>replica机创建订阅者</p>
 <p>  <code>CREATE SUBSCRIPTION name_sub CONNECTION &#39;host=ip user=username dbname=databasename PUBLICATION name&#39;</code></p>
-<p>  创建一个名为为name_sub的订阅者，根据connection的连接信息连接到master库</p>
-<p>  master库的所有指定表的数据将自动同步<br>  ** 需要 slave已经有相关的表否则无法同步 **</p>
+<p>  创建一个名为为name_sub的订阅者，根据connection的连接信息连接到primary库</p>
+<p>  primary库的所有指定表的数据将自动同步<br>  ** 需要 repicates已经有相关的表否则无法同步 **</p>
 </li>
 <li><p>删除</p>
 <p>  删除发布者 <code>drop publication name</code></p>
 <p>  删除订阅者<code>drop subscription name_sub</code></p>
 </li>
-<li><p>master 和 slave 可互相订阅达到多master的目的</p>
+<li><p>primary 和 replica 可互相订阅达到多primary的目的</p>
 <p>  可能有坑，未经测试，比如全局自增id和唯一索引</p>
 </li>
 </ul>
