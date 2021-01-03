@@ -12,7 +12,7 @@
 
 
 
-<title>Docker笔记 | Cevin</title>
+<title>TiDB的SQL MODE整理 | Cevin</title>
 
 
 
@@ -173,7 +173,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">Docker笔记</h1>
+            <h1 class="post-title">TiDB的SQL MODE整理</h1>
             
                 <div class="post-meta">
                     
@@ -182,16 +182,16 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">八月 8, 2019&nbsp;&nbsp;16:59:18</a>
+                        Date: <a href="#">八月 3, 2019&nbsp;&nbsp;17:36:24</a>
                         </span>
                     
                     
                         <span class="post-category">
                     Category:
                             
-                                <a href="/categories/docker/">docker</a>
+                                <a href="/categories/tidb/">tidb</a>
                             
-                                <a href="/categories/docker/%E7%AC%94%E8%AE%B0/">笔记</a>
+                                <a href="/categories/tidb/mysql/">mysql</a>
                             
                         </span>
                     
@@ -200,14 +200,29 @@
         </header>
 
         <div class="post-content">
-            <h1 id="进入容器"><a href="#进入容器" class="headerlink" title="进入容器"></a>进入容器</h1><ul>
-<li><p>ssh</p>
-<p>  容器内部执行ssh 通过ssh进入</p>
-</li>
-<li><p>exec</p>
-<p>  <code>docker exec -it [id|name] exec /bin/bash</code>进入bash</p>
-</li>
+            <h1 id="SQL-MODE"><a href="#SQL-MODE" class="headerlink" title="SQL_MODE"></a>SQL_MODE</h1><p><code>SQL_MODE</code>可以在一个会话中动态设置当前会话或者全局的某些参数或配置以影响MySQL接下来的处理逻辑。</p>
+<h1 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SET</span> [SESSION <span class="operator">|</span> <span class="keyword">GLOBAL</span> ] sql_mode <span class="operator">=</span> <span class="string">&#x27;mode1,mode2,mode3&#x27;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>GLOBAL需要当前登录用户有高级权限否则报错</li>
 </ul>
+<h1 id="MySQL的严格模式"><a href="#MySQL的严格模式" class="headerlink" title="MySQL的严格模式"></a>MySQL的严格模式</h1><p>在MySQL中，一般是不开启严格模式的，可能会导致某些约束不生效，比如字符串超过长度直接粗暴的截断插入，如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--- table:test</span></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test (</span><br><span class="line">    name <span class="type">varchar</span>(<span class="number">1</span>)</span><br><span class="line">)</span><br><span class="line"><span class="comment">-- insert</span></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> test (name) <span class="keyword">values</span> (<span class="string">&#x27;abc&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<p>以上SQL会执行成功，name只有一个<code>a</code>后面的<code>bc</code>则被截断和忽略，某些场景下是可以接受甚至是很有必要的但是某些场景下就真的很蛋疼。开启严格模式<code>STRICT_TRANS_TABLES</code>则可以解决该问题</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- connect</span></span><br><span class="line"><span class="comment">-- set sql_mode</span></span><br><span class="line"><span class="keyword">set</span> session sql_mode <span class="operator">=</span> <span class="string">&#x27;STRICT_TRANS_TABLES&#x27;</span></span><br><span class="line"><span class="comment">-- insert</span></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> test (name) <span class="keyword">values</span> (<span class="string">&#x27;abc&#x27;</span>)</span><br><span class="line">ERROR: ....</span><br></pre></td></tr></table></figure>
+<p>开启严格模式后，MySQL将会拒绝入库并抛出一个错误</p>
+<h1 id="TiDB的严格模式"><a href="#TiDB的严格模式" class="headerlink" title="TiDB的严格模式"></a>TiDB的严格模式</h1><p>Ref: <a target="_blank" rel="noopener" href="https://pingcap.com/docs-cn/dev/reference/sql/sql-mode/#sql-mode-%E5%88%97%E8%A1%A8-%E5%A6%82%E4%B8%8B">https://pingcap.com/docs-cn/dev/reference/sql/sql-mode/#sql-mode-%E5%88%97%E8%A1%A8-%E5%A6%82%E4%B8%8B</a></p>
+<p>TiDB的严格模式跟原生MySQL有些许不同，官方是这么描述的</p>
+<ul>
+<li>ANSI: 符合标准 SQL ，对数据进行校验，如果不符合定义类型或长度，对数据类型调整或截断保存，且返回warning警告。</li>
+<li>STRICT_TRANS_TABLES: 严格模式，对数据进严格校验，但数据出现错误时，<strong>插入到表中</strong>，并且返回错误。</li>
+<li>TRADITIONAL: 采用此模式使 TiDB 的行为象 “传统” SQL 数据库系统，当在列中插入不正确的值时“给出错误而不是警告”，一旦发现错误立即放弃INSERT/UPDATE</li>
+</ul>
+<p>单纯的<code>STRICT_TRANS_TABLES</code>的确会返回错误，但是数据依然被插入，在TiDB中如果需要严格模式推荐<code>TRADITIONAL</code></p>
+<p>TRADITIONAL 的描述如下：</p>
+<blockquote>
+<p>等同于 STRICT_TRANS_TABLES、STRICT_ALL_TABLES、NO_ZERO_IN_DATE、NO_ZERO_DATE、ERROR_FOR_DIVISION_BY_ZERO、NO_AUTO_CREATE_USER(支持)</p>
+</blockquote>
+<h1 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h1><p><code>TRADITIONAL</code>并非TiDB特有特性</p>
 
         </div>
 
@@ -218,9 +233,9 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/docker/"># docker</a>
+                        <a href="/tags/tidb/"># tidb</a>
                     
-                        <a href="/tags/%E7%AC%94%E8%AE%B0/"># 笔记</a>
+                        <a href="/tags/mysql/"># mysql</a>
                     
                         
                 </span>
@@ -236,7 +251,7 @@
                 <a class="prev" rel="prev" href="/post/FreeBSD-%E6%B7%BB%E5%8A%A0swap%E6%96%87%E4%BB%B6.html">FreeBSD 添加swap文件</a>
             
             
-            <a class="next" rel="next" href="/post/TiDB%E7%9A%84SQL_MODE.html">TiDB的SQL_MODE整理</a>
+            <a class="next" rel="next" href="/post/PostgreSQL%20foreign%20sharding%20mark.html">PostgreSQL Foreign Sharding</a>
             
         </section>
 
