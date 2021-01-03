@@ -107,6 +107,68 @@
             <div class="container">
     
     
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
 
     
     <article class="post-wrap">
@@ -136,70 +198,56 @@
         </header>
 
         <div class="post-content">
-            <ol>
-<li><p>安装插件</p>
- <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> extension postgres_fdw</span><br></pre></td></tr></table></figure></li>
-<li><p>创建Server</p>
+            <h1 id="安装插件"><a href="#安装插件" class="headerlink" title="安装插件"></a>安装插件</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> extension postgres_fdw</span><br></pre></td></tr></table></figure>
+<h1 id="创建Server"><a href="#创建Server" class="headerlink" title="创建Server"></a>创建Server</h1><ul>
+<li>创建</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">create server &#123;server_name&#125;</span><br><span class="line"><span class="keyword">foreign</span> data wrapper postgres_fdw </span><br><span class="line">options (host <span class="string">&#x27;&#123;ip&#125;&#x27;</span>, dbname <span class="string">&#x27;&#123;dbname&#125;&#x27;</span> [, port <span class="string">&#x27;&#123;server_port&#125;&#x27;</span>])</span><br></pre></td></tr></table></figure>
 <ul>
-<li><p>创建</p>
-  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">create server &#123;server_name&#125;</span><br><span class="line"><span class="keyword">foreign</span> data wrapper postgres_fdw </span><br><span class="line">options (host <span class="string">&#x27;&#123;ip&#125;&#x27;</span>, dbname <span class="string">&#x27;&#123;dbname&#125;&#x27;</span> [, port <span class="string">&#x27;&#123;server_port&#125;&#x27;</span>])</span><br></pre></td></tr></table></figure></li>
-<li><p>删除</p>
-  <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">drop server &#123;server_name&#125;</span><br></pre></td></tr></table></figure></li>
+<li>删除</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">drop server &#123;server_name&#125;</span><br></pre></td></tr></table></figure>
+<ul>
 <li><p>修改</p>
 <ul>
 <li><p>改名</p>
-  <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">alter server &#123;server_name&#125; rename to &#123;new_server_name&#125;</span><br></pre></td></tr></table></figure></li>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">alter server &#123;server_name&#125; rename to &#123;new_server_name&#125;</span><br></pre></td></tr></table></figure>
+</li>
 <li><p>修改权限</p>
-  <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">alter server &#123;server_name&#125; owner to &#123;owner_name&#125;</span><br></pre></td></tr></table></figure></li>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">alter server &#123;server_name&#125; owner to &#123;owner_name&#125;</span><br></pre></td></tr></table></figure>
+</li>
 <li><p>修改server配置</p>
-  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">alter server &#123;server_name&#125;</span><br><span class="line">options ([<span class="keyword">add</span><span class="operator">|</span><span class="keyword">set</span><span class="operator">|</span><span class="keyword">drop</span>] option <span class="keyword">value</span> ...)</span><br></pre></td></tr></table></figure>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">alter server &#123;server_name&#125;</span><br><span class="line">options ([<span class="keyword">add</span><span class="operator">|</span><span class="keyword">set</span><span class="operator">|</span><span class="keyword">drop</span>] option <span class="keyword">value</span> ...)</span><br></pre></td></tr></table></figure>
 
 
 </li>
 </ul>
 </li>
 </ul>
-</li>
-</ol>
-<ol start="3">
-<li><p>创建用户关系映射</p>
-<ul>
+<h1 id="创建用户关系映射"><a href="#创建用户关系映射" class="headerlink" title="创建用户关系映射"></a>创建用户关系映射</h1><ul>
 <li><p>创建</p>
-  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">user</span> mapping</span><br><span class="line">for &#123;current_server_logged_user&#125;</span><br><span class="line">server &#123;server_name&#125;</span><br><span class="line">options (<span class="keyword">user</span> <span class="string">&#x27;&#123;target_server_user&#125;&#x27;</span> [, password <span class="string">&#x27;password&#x27;</span>])</span><br></pre></td></tr></table></figure></li>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">user</span> mapping</span><br><span class="line">for &#123;current_server_logged_user&#125;</span><br><span class="line">server &#123;server_name&#125;</span><br><span class="line">options (<span class="keyword">user</span> <span class="string">&#x27;&#123;target_server_user&#125;&#x27;</span> [, password <span class="string">&#x27;password&#x27;</span>])</span><br></pre></td></tr></table></figure>
+</li>
 <li><p>修改</p>
+  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">user</span> mapping</span><br><span class="line">for &#123;local_user_name&#125;</span><br><span class="line">server &#123;server_name&#125;</span><br><span class="line">options ([<span class="keyword">add</span><span class="operator">|</span><span class="keyword">set</span><span class="operator">|</span><span class="keyword">drop</span>] <span class="keyword">values</span> ...)</span><br></pre></td></tr></table></figure>
+  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--- 删除password属性</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">user</span> mapping</span><br><span class="line">for &#123;local_user_name&#125;</span><br><span class="line">server &#123;server_name&#125;</span><br><span class="line">options (<span class="keyword">drop</span> password)</span><br><span class="line"><span class="comment">--- 修改user</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">user</span> mapping</span><br><span class="line">for &#123;local_user_name&#125;</span><br><span class="line">server &#123;server_name&#125;</span><br><span class="line">options (<span class="keyword">set</span> <span class="keyword">user</span> <span class="string">&#x27;username&#x27;</span>)</span><br></pre></td></tr></table></figure></li>
+<li><p>删除</p>
+  <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">drop</span> <span class="keyword">user</span> mapping</span><br><span class="line">for &#123;local_user_name&#125;</span><br><span class="line">server &#123;server_name&#125;</span><br></pre></td></tr></table></figure>
+
+
+
 </li>
 </ul>
-</li>
-</ol>
-<pre><code>    <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">user</span> mapping</span><br><span class="line">for &#123;local_user_name&#125;</span><br><span class="line">server &#123;server_name&#125;</span><br><span class="line">options ([<span class="keyword">add</span><span class="operator">|</span><span class="keyword">set</span><span class="operator">|</span><span class="keyword">drop</span>] <span class="keyword">values</span> ...)</span><br></pre></td></tr></table></figure>
-
-    <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--- 删除password属性</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">user</span> mapping</span><br><span class="line">for &#123;local_user_name&#125;</span><br><span class="line">server &#123;server_name&#125;</span><br><span class="line">options (<span class="keyword">drop</span> password)</span><br><span class="line"><span class="comment">--- 修改user</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">user</span> mapping</span><br><span class="line">for &#123;local_user_name&#125;</span><br><span class="line">server &#123;server_name&#125;</span><br><span class="line">options (<span class="keyword">set</span> <span class="keyword">user</span> <span class="string">&#x27;username&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-- 删除
-
-    <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">drop</span> <span class="keyword">user</span> mapping</span><br><span class="line">for &#123;local_user_name&#125;</span><br><span class="line">server &#123;server_name&#125;</span><br></pre></td></tr></table></figure></code></pre>
-<ol start="4">
-<li><p>创建本地分区主表</p>
- <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> t (a <span class="type">int</span>, b <span class="type">int</span>) <span class="keyword">partition</span> <span class="keyword">by</span> <span class="keyword">range</span>(b)</span><br></pre></td></tr></table></figure></li>
-<li><p>创建本地/远程服务器分区表</p>
-</li>
-</ol>
-<pre><code>&gt; 远程服务器必须先建好对应表&#123;table_name&#125;，不建议有自增主键 使用UNIQUE INDEX代替
-&gt;
-&gt; 如不指定远程表名则以本地的表名自动对应远程表名(理解为自动设置table_name为本地&quot;镜像&quot;表名)
-
-
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> [<span class="keyword">foreign</span>] <span class="keyword">table</span> t0_100 </span><br><span class="line"><span class="keyword">partition</span> <span class="keyword">of</span> t <span class="keyword">for</span> <span class="keyword">values</span> <span class="keyword">from</span> (<span class="number">0</span>) <span class="keyword">to</span> (<span class="number">100</span>)</span><br><span class="line">[server &#123;server_name&#125; [option (table_name &#x27;&#123;table_name&#125;&#x27;)] ]</span><br></pre></td></tr></table></figure></code></pre>
-<ol start="6">
-<li><p>Simple Test</p>
-<p> <code>server_name</code>设置为<code>127.0.0.1</code>，<code>user</code>设置为<code>current_user</code></p>
-</li>
-<li><p>Tips</p>
-<ul>
+<h1 id="创建本地分区主表"><a href="#创建本地分区主表" class="headerlink" title="创建本地分区主表"></a>创建本地分区主表</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> t (a <span class="type">int</span>, b <span class="type">int</span>) <span class="keyword">partition</span> <span class="keyword">by</span> <span class="keyword">range</span>(b)</span><br></pre></td></tr></table></figure>
+<h1 id="创建本地-远程服务器分区表"><a href="#创建本地-远程服务器分区表" class="headerlink" title="创建本地/远程服务器分区表"></a>创建本地/远程服务器分区表</h1><blockquote>
+<p>远程服务器必须先建好对应表{table_name}，不建议有自增主键 使用UNIQUE INDEX代替</p>
+<p>如不指定远程表名则以本地的表名自动对应远程表名(理解为自动设置table_name为本地”镜像”表名)</p>
+</blockquote>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> [<span class="keyword">foreign</span>] <span class="keyword">table</span> t0_100 </span><br><span class="line"><span class="keyword">partition</span> <span class="keyword">of</span> t <span class="keyword">for</span> <span class="keyword">values</span> <span class="keyword">from</span> (<span class="number">0</span>) <span class="keyword">to</span> (<span class="number">100</span>)</span><br><span class="line">[server &#123;server_name&#125; [option (table_name &#x27;&#123;table_name&#125;&#x27;)] ]</span><br></pre></td></tr></table></figure>
+<h1 id="Simple-Test"><a href="#Simple-Test" class="headerlink" title="Simple Test"></a>Simple Test</h1><p><code>server_name</code>设置为<code>127.0.0.1</code>，<code>user</code>设置为<code>current_user</code></p>
+<h1 id="Tips"><a href="#Tips" class="headerlink" title="Tips"></a>Tips</h1><ul>
 <li>分区表子表中有外部表时在主表中的index无法创建必须在外部表中单独创建/修改</li>
 </ul>
-</li>
-</ol>
 
         </div>
 
