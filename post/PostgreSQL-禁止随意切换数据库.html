@@ -12,7 +12,7 @@
 
 
 
-<title>FreeBSD查看所有硬盘 | Cevin</title>
+<title>PostgreSQL 禁止随意切换数据库 | Cevin</title>
 
 
 
@@ -173,7 +173,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">FreeBSD查看所有硬盘</h1>
+            <h1 class="post-title">PostgreSQL 禁止随意切换数据库</h1>
             
                 <div class="post-meta">
                     
@@ -182,7 +182,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">一月 5, 2021&nbsp;&nbsp;1:32:11</a>
+                        Date: <a href="#">一月 10, 2021&nbsp;&nbsp;0:41:00</a>
                         </span>
                     
                     
@@ -191,15 +191,19 @@
         </header>
 
         <div class="post-content">
-            <h1 id="GEOM-命令直接查看"><a href="#GEOM-命令直接查看" class="headerlink" title="GEOM 命令直接查看"></a>GEOM 命令直接查看</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ geom disk list</span><br><span class="line">Geom name: vtbd0</span><br><span class="line">Providers:</span><br><span class="line">1. Name: vtbd0</span><br><span class="line">   Mediasize: 53687091200 (50G)</span><br><span class="line">   Sectorsize: 512</span><br><span class="line">   Mode: r1w1e2</span><br><span class="line">   descr: (null)</span><br><span class="line">   ident: (null)</span><br><span class="line">   rotationrate: unknown</span><br><span class="line">   fwsectors: 63</span><br><span class="line">   fwheads: 16</span><br></pre></td></tr></table></figure>
-<h1 id="使用gpart命令"><a href="#使用gpart命令" class="headerlink" title="使用gpart命令"></a>使用gpart命令</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ gpart show</span><br><span class="line">=&gt;       40  104857520  vtbd0  GPT  (50G)</span><br><span class="line">         40       1024      1  freebsd-boot  (512K)</span><br><span class="line">       1064  104856496      2  freebsd-ufs  (50G)</span><br></pre></td></tr></table></figure>
+            <h1 id="表现"><a href="#表现" class="headerlink" title="表现"></a>表现</h1><p>任意可登录用户连接到其授权的数据库后可以直接在线切换数据库（即使他没有权限）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">user@postgres#&#x3D; \c 其他数据库</span><br><span class="line">user@其他数据库#&#x3D; 连接成功 -- 其实user并没有操作&quot;其他数据库&quot;的权限</span><br></pre></td></tr></table></figure>
+<h1 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h1><p>PostgreSQL的数据库连接权限粒度控制主要还是依靠<code>pg_hba.conf</code>文件来进行控制。</p>
+<p>其官方描述为</p>
 <blockquote>
-<p>gpart show 只显示已经挂载的盘，未挂载的空盘不显示</p>
+<p>PostgreSQL grants default privileges on some types of objects to PUBLIC. The default privileges granted to PUBLIC are as follows: CONNECT and TEMPORARY (create temporary tables) privileges for databases; EXECUTE privilege for functions; and USAGE privilege for languages and data types (including domains).</p>
 </blockquote>
-<h1 id="三方工具-lsblk"><a href="#三方工具-lsblk" class="headerlink" title="三方工具: lsblk"></a>三方工具: lsblk</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ pkg install -y lsblk &gt; /dev/null</span><br><span class="line">$ lsblk</span><br><span class="line">DEVICE         MAJ:MIN SIZE TYPE                              LABEL MOUNT</span><br><span class="line">md100            0:97  2.0G freebsd-swap                          - SWAP</span><br><span class="line">vtbd0            0:89   50G GPT                                   - SWAP</span><br><span class="line">  vtbd0p1        0:90  512K freebsd-boot       gptid/4f55508b-43a3-11e8-8147-3fd5ae6d3f2f -</span><br><span class="line">  vtbd0p2        0:91   50G freebsd-ufs</span><br></pre></td></tr></table></figure>
-<h1 id="sysctl查看系统内核参数"><a href="#sysctl查看系统内核参数" class="headerlink" title="sysctl查看系统内核参数"></a>sysctl查看系统内核参数</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ sysctl kern.disks</span><br><span class="line">kern.disks: vtbd0</span><br></pre></td></tr></table></figure>
+<h1 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 方法1</span></span><br><span class="line"><span class="keyword">REVOKE</span> <span class="keyword">CONNECT</span> <span class="keyword">ON</span> DATABASE <span class="operator">&lt;</span>数据库名称<span class="operator">&gt;</span> <span class="keyword">FROM</span> PUBLIC</span><br><span class="line"><span class="comment">-- 方法2</span></span><br><span class="line"><span class="keyword">REVOKE</span> <span class="keyword">ALL</span> PRIVILEGES <span class="keyword">ON</span> DATABASE <span class="operator">&lt;</span>数据库名称<span class="operator">&gt;</span> <span class="keyword">FROM</span> PUBLIC</span><br></pre></td></tr></table></figure>
+<ul>
+<li>每个数据库都要操作一遍</li>
+</ul>
 <blockquote>
-<p>CD-ROM也在该范围列表中</p>
+<p>以上方法在13.0~13.1中测试通过</p>
 </blockquote>
 
         </div>
@@ -211,7 +215,7 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/FreeBSD/"># FreeBSD</a>
+                        <a href="/tags/PostgreSQL/"># PostgreSQL</a>
                     
                         
                 </span>
@@ -224,10 +228,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/post/PostgreSQL-%E7%A6%81%E6%AD%A2%E9%9A%8F%E6%84%8F%E5%88%87%E6%8D%A2%E6%95%B0%E6%8D%AE%E5%BA%93.html">PostgreSQL 禁止随意切换数据库</a>
             
-            
-            <a class="next" rel="next" href="/post/FreeBSD-%E6%B7%BB%E5%8A%A0swap%E6%96%87%E4%BB%B6.html">FreeBSD 添加swap文件</a>
+            <a class="next" rel="next" href="/post/FreeBSD%E6%9F%A5%E7%9C%8B%E6%89%80%E6%9C%89%E7%A1%AC%E7%9B%98.html">FreeBSD查看所有硬盘</a>
             
         </section>
 
