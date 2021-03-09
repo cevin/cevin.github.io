@@ -194,8 +194,7 @@
             <h1 id="引发过程"><a href="#引发过程" class="headerlink" title="引发过程"></a>引发过程</h1><p>修改用户密码后，<code>flush privileges</code>后导致用户无法查询view <code>mysql.user</code></p>
 <p>报错内容：<code>ERROR 1356 (HY000): View &#39;mysql.user&#39; references invalid table(s) or column(s) or function(s) or definer/invoker of view lack rights to use them</code></p>
 <h1 id="修复过程"><a href="#修复过程" class="headerlink" title="修复过程"></a>修复过程</h1><p>重建 view</p>
-<p><code>select concat(&quot;alter DEFINER=</code>root<code>@</code>localhost` SQL SECURITY DEFINER VIEW “,TABLE_SCHEMA,”.”,TABLE_NAME,” as “,VIEW_DEFINITION,”;”) from information_schema.VIEWS where DEFINER&lt;&gt;‘user@localhost’``</p>
-
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> concat(&quot;alter DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW &quot;,TABLE_SCHEMA,&quot;.&quot;,TABLE_NAME,&quot; as &quot;,VIEW_DEFINITION,&quot;;&quot;) <span class="keyword">from</span> information_schema.VIEWS <span class="keyword">where</span> DEFINER<span class="operator">&lt;&gt;</span><span class="string">&#x27;user@localhost&#x27;</span></span><br></pre></td></tr></table></figure>
         </div>
 
         
