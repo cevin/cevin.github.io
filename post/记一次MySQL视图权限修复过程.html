@@ -12,7 +12,7 @@
 
 
 
-<title>PostgreSQL 禁止随意切换数据库 | Cevin</title>
+<title>记一次MySQL视图权限修复过程 | Cevin</title>
 
 
 
@@ -173,7 +173,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">PostgreSQL 禁止随意切换数据库</h1>
+            <h1 class="post-title">记一次MySQL视图权限修复过程</h1>
             
                 <div class="post-meta">
                     
@@ -182,7 +182,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">一月 10, 2021&nbsp;&nbsp;0:41:00</a>
+                        Date: <a href="#">三月 9, 2021&nbsp;&nbsp;16:00:42</a>
                         </span>
                     
                     
@@ -191,20 +191,10 @@
         </header>
 
         <div class="post-content">
-            <h1 id="表现"><a href="#表现" class="headerlink" title="表现"></a>表现</h1><p>任意可登录用户连接到其授权的数据库后可以直接在线切换数据库（即使他没有权限）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">user@postgres#&#x3D; \c 其他数据库</span><br><span class="line">user@其他数据库#&#x3D; 连接成功 -- 其实user并没有操作&quot;其他数据库&quot;的权限</span><br></pre></td></tr></table></figure>
-<h1 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h1><p>PostgreSQL的数据库连接权限粒度控制主要还是依靠<code>pg_hba.conf</code>文件来进行控制。</p>
-<p>其官方描述为</p>
-<blockquote>
-<p>PostgreSQL grants default privileges on some types of objects to PUBLIC. The default privileges granted to PUBLIC are as follows: CONNECT and TEMPORARY (create temporary tables) privileges for databases; EXECUTE privilege for functions; and USAGE privilege for languages and data types (including domains).</p>
-</blockquote>
-<h1 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h1><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 方法1</span></span><br><span class="line"><span class="keyword">REVOKE</span> <span class="keyword">CONNECT</span> <span class="keyword">ON</span> DATABASE <span class="operator">&lt;</span>数据库名称<span class="operator">&gt;</span> <span class="keyword">FROM</span> PUBLIC</span><br><span class="line"><span class="comment">-- 方法2</span></span><br><span class="line"><span class="keyword">REVOKE</span> <span class="keyword">ALL</span> PRIVILEGES <span class="keyword">ON</span> DATABASE <span class="operator">&lt;</span>数据库名称<span class="operator">&gt;</span> <span class="keyword">FROM</span> PUBLIC</span><br></pre></td></tr></table></figure>
-<ul>
-<li>每个数据库都要操作一遍</li>
-</ul>
-<blockquote>
-<p>以上方法在13.0~13.1中测试通过</p>
-</blockquote>
+            <h1 id="引发过程"><a href="#引发过程" class="headerlink" title="引发过程"></a>引发过程</h1><p>修改用户密码后，<code>flush privileges</code>后导致用户无法查询view <code>mysql.user</code></p>
+<p>报错内容：<code>ERROR 1356 (HY000): View &#39;mysql.user&#39; references invalid table(s) or column(s) or function(s) or definer/invoker of view lack rights to use them</code></p>
+<h1 id="修复过程"><a href="#修复过程" class="headerlink" title="修复过程"></a>修复过程</h1><p>重建 view</p>
+<p><code>select concat(&quot;alter DEFINER=</code>root<code>@</code>localhost` SQL SECURITY DEFINER VIEW “,TABLE_SCHEMA,”.”,TABLE_NAME,” as “,VIEW_DEFINITION,”;”) from information_schema.VIEWS where DEFINER&lt;&gt;‘user@localhost’``</p>
 
         </div>
 
@@ -215,7 +205,9 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/PostgreSQL/"># PostgreSQL</a>
+                        <a href="/tags/MySQL/"># MySQL</a>
+                    
+                        <a href="/tags/MariaDB/"># MariaDB</a>
                     
                         
                 </span>
@@ -228,10 +220,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/post/Debian-%E5%8C%85%E5%86%B2%E7%AA%81%E8%AE%B0%E5%BD%95.html">Debian 包冲突记录</a>
             
-            
-            <a class="next" rel="next" href="/post/FreeBSD%E6%9F%A5%E7%9C%8B%E6%89%80%E6%9C%89%E7%A1%AC%E7%9B%98.html">FreeBSD查看所有硬盘</a>
+            <a class="next" rel="next" href="/post/Debian-%E5%8C%85%E5%86%B2%E7%AA%81%E8%AE%B0%E5%BD%95.html">Debian 包冲突记录</a>
             
         </section>
 
