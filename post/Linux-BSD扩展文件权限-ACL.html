@@ -12,7 +12,7 @@
 
 
 
-<title>记一次MySQL视图权限修复过程 | Cevin</title>
+<title>Linux/BSD扩展文件权限 - ACL | Cevin</title>
 
 
 
@@ -173,7 +173,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">记一次MySQL视图权限修复过程</h1>
+            <h1 class="post-title">Linux/BSD扩展文件权限 - ACL</h1>
             
                 <div class="post-meta">
                     
@@ -182,7 +182,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">三月 9, 2021&nbsp;&nbsp;16:00:42</a>
+                        Date: <a href="#">三月 15, 2021&nbsp;&nbsp;2:18:56</a>
                         </span>
                     
                     
@@ -191,10 +191,41 @@
         </header>
 
         <div class="post-content">
-            <h1 id="引发过程"><a href="#引发过程" class="headerlink" title="引发过程"></a>引发过程</h1><p>修改用户密码后，<code>flush privileges</code>后导致用户无法查询view <code>mysql.user</code></p>
-<p>报错内容：<code>ERROR 1356 (HY000): View &#39;mysql.user&#39; references invalid table(s) or column(s) or function(s) or definer/invoker of view lack rights to use them</code></p>
-<h1 id="修复过程"><a href="#修复过程" class="headerlink" title="修复过程"></a>修复过程</h1><p>重建 view</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> concat(&quot;alter DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW &quot;,TABLE_SCHEMA,&quot;.&quot;,TABLE_NAME,&quot; as &quot;,VIEW_DEFINITION,&quot;;&quot;) <span class="keyword">from</span> information_schema.VIEWS <span class="keyword">where</span> DEFINER<span class="operator">&lt;&gt;</span><span class="string">&#x27;user@localhost&#x27;</span></span><br></pre></td></tr></table></figure>
+            <h1 id="环境要求"><a href="#环境要求" class="headerlink" title="环境要求"></a>环境要求</h1><ul>
+<li><p>不支持NFS协议</p>
+<ul>
+<li>NFSv3/4协议下使用单独的<code>nfs3/4-(set|get)facl</code>命令替代<code>(set|get)facl</code>命令</li>
+</ul>
+</li>
+<li><p>Linux</p>
+<ul>
+<li><code>/etc/fstab</code>中<code>options</code>有<code>acl</code>标记</li>
+</ul>
+</li>
+<li><p>FreeBSD</p>
+<ul>
+<li>内核有开启ACL模式</li>
+<li><code>/etc/fstab</code>中<code>options</code>有<code>acls</code>标记</li>
+<li>ZFS需要额外设置</li>
+</ul>
+</li>
+</ul>
+<h1 id="设置权限"><a href="#设置权限" class="headerlink" title="设置权限"></a>设置权限</h1><p><code>setfacl [-R] -[d]m user:@username:@rwx /path</code></p>
+<ul>
+<li><code>-R</code> 递归目录</li>
+<li><code>-d</code>新目录、文件继承acl设置</li>
+</ul>
+<p>如 <code>setfacl -m user:test:rw /test</code></p>
+<h1 id="查看权限"><a href="#查看权限" class="headerlink" title="查看权限"></a>查看权限</h1><p><code>getfacl /path</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">root@host:&#x2F;test# getfacl &#x2F;test</span><br><span class="line"># file: &#x2F;test</span><br><span class="line"># owner: root</span><br><span class="line"># group: root</span><br><span class="line">user::rwx</span><br><span class="line">user:test:rwx</span><br><span class="line">group::r-x</span><br><span class="line">mask::rwx</span><br><span class="line">other::r-x</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="清除所有acl设置"><a href="#清除所有acl设置" class="headerlink" title="清除所有acl设置"></a>清除所有acl设置</h1><p><code>setfacl -b /path</code></p>
+<h1 id="清除继承设置"><a href="#清除继承设置" class="headerlink" title="清除继承设置"></a>清除继承设置</h1><p><code>setfacl -k /path</code></p>
+<h1 id="删除指定acl设置"><a href="#删除指定acl设置" class="headerlink" title="删除指定acl设置"></a>删除指定acl设置</h1><p><code>setfacl -x [user|group]:@name</code></p>
+<p>删除acl规则后，如果是目录，如果设置过目录的继承属性，则目录下所有的文件仍然保留acl规则。</p>
+<p>需要递归删除<code>-R</code></p>
+
         </div>
 
         
@@ -204,9 +235,9 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/MySQL/"># MySQL</a>
+                        <a href="/tags/linux/"># linux</a>
                     
-                        <a href="/tags/MariaDB/"># MariaDB</a>
+                        <a href="/tags/FreeBSD/"># FreeBSD</a>
                     
                         
                 </span>
@@ -219,10 +250,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/post/Linux-BSD%E6%89%A9%E5%B1%95%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90-ACL.html">Linux/BSD扩展文件权限 - ACL</a>
             
-            
-            <a class="next" rel="next" href="/post/Debian-%E5%8C%85%E5%86%B2%E7%AA%81%E8%AE%B0%E5%BD%95.html">Debian 包冲突记录</a>
+            <a class="next" rel="next" href="/post/%E8%AE%B0%E4%B8%80%E6%AC%A1MySQL%E8%A7%86%E5%9B%BE%E6%9D%83%E9%99%90%E4%BF%AE%E5%A4%8D%E8%BF%87%E7%A8%8B.html">记一次MySQL视图权限修复过程</a>
             
         </section>
 
