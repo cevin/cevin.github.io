@@ -12,7 +12,7 @@
 
 
 
-<title>Linux/BSD扩展文件权限 - ACL | Cevin</title>
+<title>FreeBSD开启BBR拥塞算法 | Cevin</title>
 
 
 
@@ -173,7 +173,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">Linux/BSD扩展文件权限 - ACL</h1>
+            <h1 class="post-title">FreeBSD开启BBR拥塞算法</h1>
             
                 <div class="post-meta">
                     
@@ -182,7 +182,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">三月 15, 2021&nbsp;&nbsp;2:18:56</a>
+                        Date: <a href="#">三月 15, 2021&nbsp;&nbsp;11:30:10</a>
                         </span>
                     
                     
@@ -191,40 +191,20 @@
         </header>
 
         <div class="post-content">
-            <h1 id="环境要求"><a href="#环境要求" class="headerlink" title="环境要求"></a>环境要求</h1><ul>
-<li><p>不支持NFS协议</p>
-<ul>
-<li>NFSv3/4协议下使用单独的<code>nfs3/4-(set|get)facl</code>命令替代<code>(set|get)facl</code>命令</li>
-</ul>
+            <h1 id="要求"><a href="#要求" class="headerlink" title="要求"></a>要求</h1><p>操作系统版本<code>&gt;=13.0</code></p>
+<h1 id="模块依赖"><a href="#模块依赖" class="headerlink" title="模块依赖"></a>模块依赖</h1><p><code>cc_htcp</code></p>
+<p>临时手动加载，使用<code>kldload</code>工具 <code>kldload cc_htcp</code></p>
+<p>开启自动加载</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># /boot/loader.conf</span></span><br><span class="line"><span class="comment"># 或者 /boot/loader.conf.local</span></span><br><span class="line"></span><br><span class="line"><span class="attr">cc_htcp_load</span>=<span class="string">&quot;YES&quot;</span></span><br></pre></td></tr></table></figure>
+<h1 id="开启BBR"><a href="#开启BBR" class="headerlink" title="开启BBR"></a>开启BBR</h1><ul>
+<li><p>查看系统当前是否已经支持BBR</p>
+<p>  <code>sysctl net.inet.tcp.cc.available</code></p>
 </li>
-<li><p>Linux</p>
-<ul>
-<li><code>/etc/fstab</code>中<code>options</code>有<code>acl</code>标记</li>
-</ul>
-</li>
-<li><p>FreeBSD</p>
-<ul>
-<li>内核有开启ACL模式</li>
-<li><code>/etc/fstab</code>中<code>options</code>有<code>acls</code>标记</li>
-<li>ZFS需要额外设置</li>
-</ul>
+<li><p>临时启用</p>
+<p>  <code> sysctl net.inet.tcp.cc.algorithm=htcp</code></p>
+<p>  永久启用写入<code>/etc/sysctl.conf</code>即可</p>
 </li>
 </ul>
-<h1 id="设置权限"><a href="#设置权限" class="headerlink" title="设置权限"></a>设置权限</h1><p><code>setfacl [-R] -[d]m user:@username:@rwx /path</code></p>
-<ul>
-<li><code>-R</code> 递归目录</li>
-<li><code>-d</code>新目录、文件继承acl设置</li>
-</ul>
-<p>如 <code>setfacl -m user:test:rw /test</code></p>
-<h1 id="查看权限"><a href="#查看权限" class="headerlink" title="查看权限"></a>查看权限</h1><p><code>getfacl /path</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">root@host:&#x2F;test# getfacl &#x2F;test</span><br><span class="line"># file: &#x2F;test</span><br><span class="line"># owner: root</span><br><span class="line"># group: root</span><br><span class="line">user::rwx</span><br><span class="line">user:test:rwx</span><br><span class="line">group::r-x</span><br><span class="line">mask::rwx</span><br><span class="line">other::r-x</span><br></pre></td></tr></table></figure>
-
-
-<h1 id="清除所有acl设置"><a href="#清除所有acl设置" class="headerlink" title="清除所有acl设置"></a>清除所有acl设置</h1><p><code>setfacl -b /path</code></p>
-<h1 id="清除继承设置"><a href="#清除继承设置" class="headerlink" title="清除继承设置"></a>清除继承设置</h1><p><code>setfacl -k /path</code></p>
-<h1 id="删除指定acl设置"><a href="#删除指定acl设置" class="headerlink" title="删除指定acl设置"></a>删除指定acl设置</h1><p><code>setfacl -x [user|group]:@name</code></p>
-<p>删除acl规则后，如果是目录，如果设置过目录的继承属性，则目录下所有的文件仍然保留acl规则。</p>
-<p>需要递归删除<code>-R</code></p>
 
         </div>
 
@@ -234,8 +214,6 @@
                 <span>Tag(s):</span>
                 <span class="tag">
                     
-                    
-                        <a href="/tags/linux/"># linux</a>
                     
                         <a href="/tags/FreeBSD/"># FreeBSD</a>
                     
@@ -250,10 +228,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/post/FreeBSD%E5%BC%80%E5%90%AFBBR%E6%8B%A5%E5%A1%9E%E7%AE%97%E6%B3%95.html">FreeBSD开启BBR拥塞算法</a>
             
-            
-            <a class="next" rel="next" href="/post/%E8%AE%B0%E4%B8%80%E6%AC%A1MySQL%E8%A7%86%E5%9B%BE%E6%9D%83%E9%99%90%E4%BF%AE%E5%A4%8D%E8%BF%87%E7%A8%8B.html">记一次MySQL视图权限修复过程</a>
+            <a class="next" rel="next" href="/post/Linux-BSD%E6%89%A9%E5%B1%95%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90-ACL.html">Linux/BSD扩展文件权限 - ACL</a>
             
         </section>
 
