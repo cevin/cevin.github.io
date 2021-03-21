@@ -12,7 +12,7 @@
 
 
 
-<title>FreeBSD开启BBR拥塞控制算法 | Cevin</title>
+<title>PHP GD&amp;Imagick 开启图片隔行扫描 | Cevin</title>
 
 
 
@@ -173,7 +173,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">FreeBSD开启BBR拥塞控制算法</h1>
+            <h1 class="post-title">PHP GD&amp;Imagick 开启图片隔行扫描</h1>
             
                 <div class="post-meta">
                     
@@ -182,7 +182,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">三月 15, 2021&nbsp;&nbsp;11:30:10</a>
+                        Date: <a href="#">三月 21, 2021&nbsp;&nbsp;11:23:16</a>
                         </span>
                     
                     
@@ -191,22 +191,9 @@
         </header>
 
         <div class="post-content">
-            <h1 id="要求"><a href="#要求" class="headerlink" title="要求"></a>要求</h1><p>操作系统版本<code>&gt;=13.0</code></p>
-<h1 id="模块依赖"><a href="#模块依赖" class="headerlink" title="模块依赖"></a>模块依赖</h1><p><code>cc_htcp</code></p>
-<p>临时手动加载，使用<code>kldload</code>工具 <code>kldload cc_htcp</code></p>
-<p>开启自动加载</p>
-<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># /boot/loader.conf</span></span><br><span class="line"><span class="comment"># 或者 /boot/loader.conf.local</span></span><br><span class="line"></span><br><span class="line"><span class="attr">cc_htcp_load</span>=<span class="string">&quot;YES&quot;</span></span><br></pre></td></tr></table></figure>
-<h1 id="开启BBR"><a href="#开启BBR" class="headerlink" title="开启BBR"></a>开启BBR</h1><ul>
-<li><p>查看系统当前是否已经支持BBR</p>
-<p>  <code>sysctl net.inet.tcp.cc.available</code></p>
-</li>
-<li><p>临时启用</p>
-<p>  <code> sysctl net.inet.tcp.cc.algorithm=htcp</code></p>
-<p>  永久启用写入<code>/etc/sysctl.conf</code>即可</p>
-</li>
-</ul>
-<h1 id="tip"><a href="#tip" class="headerlink" title="tip"></a>tip</h1><p>当<code>sysctl</code>配置和htcp模块同时启用则开启</p>
-
+            <h1 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h1><p>网页加载大图片，大图加载过程从模糊到清晰</p>
+<h1 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h1><h2 id="GD"><a href="#GD" class="headerlink" title="GD"></a>GD</h2><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$im</span> = imagecreatefrom(gif|webp|png|jpg)(<span class="string">&#x27;image.ext&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 开启各行扫描</span></span><br><span class="line">imageinterlace(<span class="variable">$im</span>, <span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line">image(gif|webp|png|jpg)(<span class="variable">$im</span>);</span><br><span class="line">imagedestroy(<span class="variable">$img</span>);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="Imagick"><a href="#Imagick" class="headerlink" title="Imagick"></a>Imagick</h2><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$img</span> = <span class="keyword">new</span> Imagick(<span class="string">&#x27;image.ext&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$img</span>-&gt;setInterlaceScheme(Imagick::INTERLACE_PLANE);</span><br><span class="line"></span><br><span class="line"><span class="variable">$image</span>-&gt;writeImage(<span class="string">&#x27;image.ext&#x27;</span>);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
         </div>
 
         
@@ -216,7 +203,7 @@
                 <span class="tag">
                     
                     
-                        <a href="/tags/FreeBSD/"># FreeBSD</a>
+                        <a href="/tags/PHP/"># PHP</a>
                     
                         
                 </span>
@@ -229,10 +216,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/post/PHP-GD-Imagick-%E5%BC%80%E5%90%AF%E5%9B%BE%E7%89%87%E9%9A%94%E8%A1%8C%E6%89%AB%E6%8F%8F.html">PHP GD&Imagick 开启图片隔行扫描</a>
             
-            
-            <a class="next" rel="next" href="/post/Linux-BSD%E6%89%A9%E5%B1%95%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90-ACL.html">Linux/BSD扩展文件权限 - ACL</a>
+            <a class="next" rel="next" href="/post/FreeBSD%E5%BC%80%E5%90%AFBBR%E6%8B%A5%E5%A1%9E%E6%8E%A7%E5%88%B6%E7%AE%97%E6%B3%95.html">FreeBSD开启BBR拥塞控制算法</a>
             
         </section>
 
