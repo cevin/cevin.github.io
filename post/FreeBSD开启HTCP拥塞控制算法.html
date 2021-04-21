@@ -12,7 +12,7 @@
 
 
 
-<title>FreeBSD开启BBR拥塞控制算法 | Cevin</title>
+<title>FreeBSD开启HTCP拥塞控制算法 | Cevin</title>
 
 
 
@@ -176,7 +176,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">FreeBSD开启BBR拥塞控制算法</h1>
+            <h1 class="post-title">FreeBSD开启HTCP拥塞控制算法</h1>
             
                 <div class="post-meta">
                     
@@ -200,7 +200,7 @@
 <p>临时手动加载，使用<code>kldload</code>工具 <code>kldload cc_htcp</code></p>
 <p>开启自动加载</p>
 <figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># /boot/loader.conf</span></span><br><span class="line"><span class="comment"># 或者 /boot/loader.conf.local</span></span><br><span class="line"></span><br><span class="line"><span class="attr">cc_htcp_load</span>=<span class="string">&quot;YES&quot;</span></span><br></pre></td></tr></table></figure>
-<h1 id="开启BBR"><a href="#开启BBR" class="headerlink" title="开启BBR"></a>开启BBR</h1><ul>
+<h1 id="开启HTCP"><a href="#开启HTCP" class="headerlink" title="开启HTCP"></a>开启HTCP</h1><ul>
 <li><p>查看系统当前是否已经支持BBR</p>
 <p>  <code>sysctl net.inet.tcp.cc.available</code></p>
 </li>
